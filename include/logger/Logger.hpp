@@ -6,10 +6,13 @@
 #include <chrono>
 #include <ctime>
 
-namespace Fluxor::Logger
+namespace Fluxor
 {
 
-    enum class Level : uint8_t
+    // --------------------------------------------------
+    // Log levels
+    // --------------------------------------------------
+    enum class LoggerLevel : uint8_t
     {
         Trace,
         Debug,
@@ -21,7 +24,7 @@ namespace Fluxor::Logger
     };
 
 #ifndef FLUXORLOGGER_ACTIVE_LEVEL
-#define FLUXORLOGGER_ACTIVE_LEVEL Fluxor::Logger::Level::Trace
+#define FLUXORLOGGER_ACTIVE_LEVEL Fluxor::LoggerLevel::Trace
 #endif
 
     // --------------------------------------------------
@@ -90,12 +93,12 @@ namespace Fluxor::Logger
             return inst;
         }
 
-        void set_level(Level lvl) { level_ = lvl; }
+        void set_level(LoggerLevel lvl) { level_ = lvl; }
 
         void set_sink(Sink *sink) { sink_ = sink; }
 
         template <typename... Args>
-        void log(Level lvl,
+        void log(LoggerLevel lvl,
                  const char *file,
                  int line,
                  const char *func,
@@ -131,6 +134,8 @@ namespace Fluxor::Logger
         void append_timestamp(FixedBuffer<1024> &buf)
         {
             auto now = std::chrono::system_clock::now();
+            auto seconds = time_point_cast<std::chrono::seconds>(now);
+            auto micros = duration_cast<std::chrono::microseconds>(now - seconds).count();
             auto t = std::chrono::system_clock::to_time_t(now);
 
             std::tm tm{};
@@ -143,31 +148,36 @@ namespace Fluxor::Logger
             char timebuf[32];
             strftime(timebuf, sizeof(timebuf), "%H:%M:%S", &tm);
 
-            buf.append(timebuf, strlen(timebuf));
+            // final format: HH:MM:SS.ffffff
+            char finalbuf[64];
+            int len = snprintf(finalbuf, sizeof(finalbuf),
+                               "%s.%06lld", timebuf, (long long)micros);
+
+            buf.append(finalbuf, static_cast<size_t>(len));
             buf.append(" ", 1);
         }
 
-        void append_level(FixedBuffer<1024> &buf, Level lvl)
+        void append_level(FixedBuffer<1024> &buf, LoggerLevel lvl)
         {
             const char *s = "UNK";
             switch (lvl)
             {
-            case Level::Trace:
+            case LoggerLevel::Trace:
                 s = "TRACE";
                 break;
-            case Level::Debug:
+            case LoggerLevel::Debug:
                 s = "DEBUG";
                 break;
-            case Level::Info:
+            case LoggerLevel::Info:
                 s = "INFO";
                 break;
-            case Level::Warn:
+            case LoggerLevel::Warn:
                 s = "WARN";
                 break;
-            case Level::Error:
+            case LoggerLevel::Error:
                 s = "ERROR";
                 break;
-            case Level::Fatal:
+            case LoggerLevel::Fatal:
                 s = "FATAL";
                 break;
             default:
@@ -177,7 +187,7 @@ namespace Fluxor::Logger
         }
 
     private:
-        Level level_ = Level::Info;
+        LoggerLevel level_ = LoggerLevel::Info;
         Sink *sink_;
         ConsoleSink console_;
         std::mutex mutex_;
@@ -185,19 +195,19 @@ namespace Fluxor::Logger
         char temp_[512]; // formatting buffer (reused, no alloc)
     };
 
-} // namespace Fluxor::Logger
+} // namespace Fluxor
 
 #define LOG_TRACE(fmt, ...) \
-    Fluxor::Logger::Logger::instance().log(Fluxor::Logger::Level::Trace, __FILE__, __LINE__, __func__, fmt, ##__VA_ARGS__)
+    Fluxor::Logger::instance().log(Fluxor::LoggerLevel::Trace, __FILE__, __LINE__, __func__, fmt, ##__VA_ARGS__)
 
 #define LOG_DEBUG(fmt, ...) \
-    Fluxor::Logger::Logger::instance().log(Fluxor::Logger::Level::Debug, __FILE__, __LINE__, __func__, fmt, ##__VA_ARGS__)
+    Fluxor::Logger::instance().log(Fluxor::LoggerLevel::Debug, __FILE__, __LINE__, __func__, fmt, ##__VA_ARGS__)
 
 #define LOG_INFO(fmt, ...) \
-    Fluxor::Logger::Logger::instance().log(Fluxor::Logger::Level::Info, __FILE__, __LINE__, __func__, fmt, ##__VA_ARGS__)
+    Fluxor::Logger::instance().log(Fluxor::LoggerLevel::Info, __FILE__, __LINE__, __func__, fmt, ##__VA_ARGS__)
 
 #define LOG_WARN(fmt, ...) \
-    Fluxor::Logger::Logger::instance().log(Fluxor::Logger::Level::Warn, __FILE__, __LINE__, __func__, fmt, ##__VA_ARGS__)
+    Fluxor::Logger::instance().log(Fluxor::LoggerLevel::Warn, __FILE__, __LINE__, __func__, fmt, ##__VA_ARGS__)
 
 #define LOG_ERROR(fmt, ...) \
-    Fluxor::Logger::Logger::instance().log(Fluxor::Logger::Level::Error, __FILE__, __LINE__, __func__, fmt, ##__VA_ARGS__)
+    Fluxor::Logger::instance().log(Fluxor::LoggerLevel::Error, __FILE__, __LINE__, __func__, fmt, ##__VA_ARGS__)

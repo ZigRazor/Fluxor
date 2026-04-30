@@ -3,6 +3,7 @@
 #include "db/storage_engine/StorageEngine.h"
 #include "db/memory_layer/Table.h"
 #include "db/memory_layer/Record.h"
+#include "logger/Logger.hpp"
 
 using namespace Fluxor;
 
@@ -101,6 +102,7 @@ TEST(StorageEngineTest, DropTableRemovesData)
 // ------------------------
 TEST(DatabaseInterfaceTest, PutAndGet)
 {
+    Logger::instance().set_level(LoggerLevel::Trace);
     DatabaseInterface db;
 
     db.createTable("users");
@@ -118,6 +120,7 @@ TEST(DatabaseInterfaceTest, PutAndGet)
 
 TEST(DatabaseInterfaceTest, EraseRecord)
 {
+    Logger::instance().set_level(LoggerLevel::Trace);
     DatabaseInterface db;
 
     db.createTable("users");
@@ -138,6 +141,7 @@ TEST(DatabaseInterfaceTest, EraseRecord)
 // ------------------------
 TEST(DatabaseInterfaceTest, SnapshotAndRestore)
 {
+    Logger::instance().set_level(LoggerLevel::Trace);
     DatabaseInterface db;
 
     db.createTable("users");
@@ -163,6 +167,7 @@ TEST(DatabaseInterfaceTest, SnapshotAndRestore)
 // ------------------------
 TEST(FluxorIntegrationTest, FullWorkflow)
 {
+    Logger::instance().set_level(LoggerLevel::Trace);
     DatabaseInterface db;
 
     db.createTable("users");
