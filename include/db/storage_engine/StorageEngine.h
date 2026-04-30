@@ -1,6 +1,6 @@
 #pragma once
-#include "Record.h"
-#include "Table.h"
+#include "db/memory_layer/Record.h"
+#include "db/memory_layer/Table.h"
 
 namespace Fluxor
 {

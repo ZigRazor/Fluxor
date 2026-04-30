@@ -1,5 +1,5 @@
-#include "DatabaseInterface.h"
-#include "Logger.hpp"
+#include "db/api_layer/DatabaseInterface.h"
+#include "logger/Logger.hpp"
 
 using namespace Fluxor;
 

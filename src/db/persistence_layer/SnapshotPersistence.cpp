@@ -1,4 +1,4 @@
-#include "SnapshotPersistence.h"
+#include "db/persistence_layer/SnapshotPersistence.h"
 #include <fstream>
 #include <stdexcept>
 
@@ -64,7 +64,7 @@ void SnapshotPersistence::load(StorageEngine &engine, const std::string &filenam
             // Create a new record and add it to the current table
             // This is a placeholder and should be replaced with actual deserialization logic
             record.set("id", recordKey); // Assuming "id" is the primary key field
-            engine.insert(tableName, record);
+            engine.insert(tableName, recordKey, record);
         }
         else if (line.find("Field Key:") != std::string::npos)
         {

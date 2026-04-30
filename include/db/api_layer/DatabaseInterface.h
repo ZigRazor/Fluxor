@@ -1,5 +1,5 @@
 #pragma once
-#include "StorageEngine.h"
+#include "db/storage_engine/StorageEngine.h"
 
 namespace Fluxor
 {
@@ -13,7 +13,7 @@ namespace Fluxor
         DatabaseInterface &operator=(DatabaseInterface &&other) = default;
         ~DatabaseInterface() = default;
 
-        void put(const StorageEngine::TableName &tableName, const Record &record);
+        void put(const StorageEngine::TableName &tableName, const Table::RecordKey &recordKey, const Record &record);
         std::optional<Record> get(const StorageEngine::TableName &tableName, const Table::RecordKey &recordKey) const;
         void erase(const StorageEngine::TableName &tableName, const Table::RecordKey &recordKey);
         void createTable(const StorageEngine::TableName &tableName);
