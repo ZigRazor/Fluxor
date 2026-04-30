@@ -21,7 +21,7 @@ namespace Fluxor
         Table &getTable(const TableName &name);
         const Table &getTable(const TableName &name) const;
         void dropTable(const TableName &name);
-        void insert(const TableName &name, const Record &record);
+        void insert(const TableName &name, const Table::RecordKey &key, const Record &record);
         std::optional<Record> get(const TableName &name, const Table::RecordKey &key) const;
         void remove(const TableName &name, const Table::RecordKey &key);
         const std::pmr::unordered_map<TableName, Table> snapshot() const;

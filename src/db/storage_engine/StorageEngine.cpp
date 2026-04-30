@@ -22,9 +22,9 @@ void StorageEngine::dropTable(const TableName &name)
     tables.erase(name);
 }
 
-void StorageEngine::insert(const TableName &name, const Record &record)
+void StorageEngine::insert(const TableName &name, const Table::RecordKey &key, const Record &record)
 {
-    tables[name].insert(std::get<std::string>(record.get("id").value_or("")), record);
+    tables[name].insert(key, record);
 }
 
 std::optional<Record> StorageEngine::get(const TableName &name, const Table::RecordKey &key) const
